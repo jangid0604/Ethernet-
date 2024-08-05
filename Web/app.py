@@ -4,15 +4,16 @@ import socket
 app = Flask(__name__)
 
 # Function to send data through Ethernet
-def send_data(data):
-    # Example IP and port
-    host = '192.168.1.100'
-    port = 12345
+def send_file(file_data):
+    host = '192.168.1.100'  # Change this to your target IP
+    port = 12345            # Change this to your target port
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         sock.connect((host, port))
-        sock.sendall(data.encode('utf-8'))
+        sock.sendall(file_data)
         response = sock.recv(1024).decode('utf-8')
+    except Exception as e:
+        response = str(e)
     finally:
         sock.close()
     return response
@@ -21,13 +22,16 @@ def send_data(data):
 def index():
     return render_template('index.html')
 
-@app.route('/send', methods=['POST'])
-def send():
-    data = request.json.get('data')
-    if data:
-        response = send_data(data)
-        return jsonify({'response': response})
-    return jsonify({'error': 'No data received'}), 400
+@app.route('/upload', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    file_data = file.read()
+    response = send_file(file_data)
+    return jsonify({'response': response})
 
 if __name__ == '__main__':
     app.run(debug=True)

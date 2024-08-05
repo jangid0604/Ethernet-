@@ -3,25 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethernet Data Communication</title>
+    <title>Ethernet File Transfer</title>
 </head>
 <body>
-    <h1>Send Data via Ethernet</h1>
-    <input type="text" id="dataInput" placeholder="Enter data to send">
-    <button onclick="sendData()">Send</button>
+    <h1>Send File via Ethernet</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file">
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
     <p id="response"></p>
 
     <script>
-        async function sendData() {
-            const data = document.getElementById('dataInput').value;
+        async function uploadFile() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
             const responseElement = document.getElementById('response');
+
+            if (fileInput.files.length === 0) {
+                responseElement.textContent = 'No file selected';
+                return;
+            }
+
+            formData.append('file', fileInput.files[0]);
+
             try {
-                const response = await fetch('/send', {
+                const response = await fetch('/upload', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ data: data })
+                    body: formData
                 });
                 const result = await response.json();
                 if (response.ok) {
