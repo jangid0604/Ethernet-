@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethernet Data Communication</title>
+</head>
+<body>
+    <h1>Send Data via Ethernet</h1>
+    <input type="text" id="dataInput" placeholder="Enter data to send">
+    <button onclick="sendData()">Send</button>
+    <p id="response"></p>
+
+    <script>
+        async function sendData() {
+            const data = document.getElementById('dataInput').value;
+            const responseElement = document.getElementById('response');
+            try {
+                const response = await fetch('/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: data })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    responseElement.textContent = 'Response: ' + result.response;
+                } else {
+                    responseElement.textContent = 'Error: ' + result.error;
+                }
+            } catch (error) {
+                responseElement.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
